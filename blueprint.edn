@@ -1,0 +1,33 @@
+{:itonami.blueprint/id "cloud-itonami-isic-1702"
+ :itonami.blueprint/name "Manufacture of corrugated paper and paperboard and of containers of paper and paperboard"
+ :itonami.blueprint/isic-rev5 "1702"
+ :itonami.blueprint/domain :corrugated-packaging/plant-operations
+ :itonami.blueprint/license "AGPL-3.0-or-later"
+ :itonami.blueprint/social-impact [:worker-safety :environmental-stewardship :resource-efficiency]
+ :itonami.blueprint/governor :corrugated-packaging-plant-operations-governor
+ :itonami.blueprint/robotics true
+ :itonami.blueprint/required-technologies [:robotics :identity :forms :dmn :bpmn :audit-ledger :cae]
+ :itonami.blueprint/status :public-oss
+ :itonami.blueprint/maturity :implemented
+ :itonami.blueprint/implemented-slice
+ "CorrugatedPackagingAdvisor ⊣ Corrugated Packaging Plant Operations
+ Governor, langgraph-clj StateGraph, append-only audit ledger. A plant
+ OPERATIONS COORDINATION actor for corrugated-board/box manufacturing
+ (corrugator line, printer-slotter/flexo-folder-gluer/die-cutter
+ converting lines) -- not direct corrugator/converting-line-equipment
+ control authority. Four ops (`:log-production-batch` /
+ `:schedule-maintenance` / `:flag-safety-concern` /
+ `:coordinate-shipment`), all `:effect :propose` only. Eleven concrete
+ governor checks elaborate this blueprint's HARD invariants:
+ propose-only effect, closed op allowlist, closed proposal-effect
+ allowlist (any proposal touching corrugator/converting-line-equipment
+ control is a hard, permanent block), independent equipment
+ verification/registration before maintenance scheduling, independent
+ batch verification/registration before shipment coordination,
+ independent shipment-quantity recompute against the batch's own
+ logged quantity, double-schedule guard, board/container-grade
+ validation, and burst-strength/edge-crush-test plausibility
+ validation. Safety-concern flagging (equipment hazard / quality
+ defect) ALWAYS escalates to a human plant supervisor;
+ `:log-production-batch` is the only op eligible to auto-commit, and
+ only at phase 3 when governor-clean."}
