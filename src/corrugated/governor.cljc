@@ -131,7 +131,14 @@
                                        ALWAYS set for `:flag-safety-
                                        concern`) -- escalate to a human
                                        plant supervisor. SOFT: the
-                                       human may approve."
+                                       human may approve.
+   12. Handoff malformed          -- for `:coordinate-shipment`, an
+                                       OPTIONAL `:handoff` record
+                                       (downstream to e.g. isic-1075)
+                                       that IS present but malformed --
+                                       absence of `:handoff` is never
+                                       itself a violation, only a
+                                       present-but-malformed one is."
   (:require [corrugated.registry :as registry]
             [corrugated.store :as store]))
 
@@ -276,6 +283,23 @@
         [{:rule :invalid-edge-crush
           :detail (str kn-m "kN/m は物理的に妥当な圧縮強さ(ECT)の範囲外")}]))))
 
+(defn- handoff-malformed-violations
+  "HARD, but ONLY when a `:handoff` map is actually present under the
+  proposal's `:value`: verify (via `registry/handoff-record-well-
+  formed?`) that it carries every required field with a plausible
+  value. A malformed handoff would actively mislead the downstream
+  receiving actor (e.g. isic-1075), so if one is attached at all it
+  must be well-formed -- but its ABSENCE is never itself a violation,
+  since attaching a `:handoff` to this actor's shipment-coordination
+  proposal is entirely optional (see `corrugated.registry`'s
+  \"Downstream Cross-Actor Handoff\" section)."
+  [{:keys [op]} proposal]
+  (when (= op :coordinate-shipment)
+    (let [handoff (get-in proposal [:value :handoff])]
+      (when (and (some? handoff) (not (registry/handoff-record-well-formed? handoff)))
+        [{:rule :handoff-malformed
+          :detail "coordinate-shipment提案に添付された:handoffレコードが必須フィールドを欠く、または数量が正の数でない"}]))))
+
 (defn check
   "Censors a CorrugatedPackagingAdvisor proposal against the governor
   rules. Returns {:ok? bool :violations [..] :confidence c :escalate?
@@ -291,7 +315,8 @@
                            (shipment-quantity-exceeded-violations request proposal st)
                            (invalid-grade-violations request proposal)
                            (invalid-burst-strength-violations request proposal)
-                           (invalid-edge-crush-violations request proposal)))
+                           (invalid-edge-crush-violations request proposal)
+                           (handoff-malformed-violations request proposal)))
         conf (:confidence proposal 0.0)
         low? (< conf confidence-floor)
         stakes? (boolean (high-stakes (:stake proposal)))
