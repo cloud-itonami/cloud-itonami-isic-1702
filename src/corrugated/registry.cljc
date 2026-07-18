@@ -233,7 +233,7 @@
 ;; consumer of its packaging (e.g. cloud-itonami-isic-1075). Reuses the
 ;; SAME `:handoff/*` wire shape isic-1075 already uses for its own
 ;; downstream isic-1075<->jsic-4721 handoff -- see superproject
-;; ADR-2607181500. A `:handoff` here is OPTIONAL, not required: existing
+;; ADR-2800000800. A `:handoff` here is OPTIONAL, not required: existing
 ;; shipment-coordination proposals worked before this field existed and
 ;; keep working unchanged with no `:handoff` attached at all.
 ;;
