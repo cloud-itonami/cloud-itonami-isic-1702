@@ -110,6 +110,42 @@
       (is (some #{:shipment-quantity-exceeded} (-> (store/ledger db) last :basis)))
       (is (empty? (store/shipment-history db))))))
 
+(deftest handoff-malformed-is-held-and-unoverridable
+  (testing "a shipment proposal whose OPTIONAL :handoff record is present but malformed -> HOLD"
+    (let [[db actor] (fresh)
+          res (exec-op actor "t7b"
+                    {:op :coordinate-shipment :effect :propose :subject "ship-4"
+                     :value {:batch-id "batch-001" :quantity-units 10.0
+                             :destination "buyer-box-north"
+                             :handoff {:handoff/id "h-1"
+                                       :handoff/source-actor "cloud-itonami-isic-1702"
+                                       :handoff/batch-id "batch-001"
+                                       :handoff/product-type-id :single-wall-c-flute
+                                       :handoff/dispatched-at-iso "2026-07-17T00:00:00Z"}}}
+                    coordinator)]
+      (is (= :hold (get-in res [:state :disposition])))
+      (is (not= :interrupted (:status res)))
+      (is (some #{:handoff-malformed} (-> (store/ledger db) last :basis)))
+      (is (empty? (store/shipment-history db))))))
+
+(deftest handoff-well-formed-does-not-add-a-hold-reason
+  (testing "a shipment proposal with a WELL-FORMED optional :handoff still escalates (coordinate-shipment always needs approval, same as the handoff-less clean case) rather than being HELD for :handoff-malformed"
+    (let [[db actor] (fresh)
+          res (exec-op actor "t7c"
+                    {:op :coordinate-shipment :effect :propose :subject "ship-5"
+                     :value {:batch-id "batch-001" :quantity-units 10.0
+                             :destination "buyer-box-north"
+                             :handoff {:handoff/id "h-2"
+                                       :handoff/source-actor "cloud-itonami-isic-1702"
+                                       :handoff/batch-id "batch-001"
+                                       :handoff/product-type-id :single-wall-c-flute
+                                       :handoff/quantity-kg 40.0
+                                       :handoff/dispatched-at-iso "2026-07-17T00:00:00Z"}}}
+                    coordinator)]
+      (is (= :interrupted (:status res)))
+      (let [r2 (approve! actor "t7c")]
+        (is (= :commit (get-in r2 [:state :disposition])))))))
+
 (deftest schedule-maintenance-double-schedule-is-held
   (testing "scheduling the SAME maintenance record twice -> HOLD on the second attempt"
     (let [[db actor] (fresh)

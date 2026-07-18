@@ -165,3 +165,19 @@
     (is (= 2 (count hist2)))
     (is (= "MNT-000000" (get-in hist2 [0 "record_id"])))
     (is (= "MNT-000001" (get-in hist2 [1 "record_id"])))))
+
+;; ─────── Downstream Cross-Actor Handoff (optional, isic-1702 -> isic-1075) ───────
+
+(def ^:private well-formed-handoff
+  {:handoff/id "h-1"
+   :handoff/source-actor "cloud-itonami-isic-1702"
+   :handoff/batch-id "batch-001"
+   :handoff/product-type-id :regular-slotted-container
+   :handoff/quantity-kg 80.0
+   :handoff/dispatched-at-iso "2026-07-17T00:00:00Z"})
+
+(deftest handoff-record-well-formed-test
+  (is (true? (r/handoff-record-well-formed? well-formed-handoff)))
+  (is (false? (r/handoff-record-well-formed? (dissoc well-formed-handoff :handoff/quantity-kg))))
+  (is (false? (r/handoff-record-well-formed? (assoc well-formed-handoff :handoff/quantity-kg 0))))
+  (is (false? (r/handoff-record-well-formed? nil))))
