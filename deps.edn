@@ -8,7 +8,11 @@
  ;; directly (not only under :dev) so a bare `clojure -M:test` works
  ;; offline inside the monorepo checkout without depending on
  ;; langgraph's own transitive git/sha pin being fetchable.
- :deps {io.github.kotoba-lang/langgraph
+ :deps {
+        io.github.kotoba-lang/jp-go-digital-design-system
+        {:git/url "https://github.com/kotoba-lang/jp-go-digital-design-system"
+         :git/sha "83db99546eabc53613ae826ea41d1533a3c574af"}
+io.github.kotoba-lang/langgraph
         {:local/root "../../kotoba-lang/langgraph"}
         io.github.kotoba-lang/langchain
         {:local/root "../../kotoba-lang/langchain"}}
@@ -21,6 +25,8 @@
          {:local/root "../../kotoba-lang/langchain"}}}
   ;; clojure -M:dev:run  -> drive the demo through one OperationActor
   :run {:main-opts ["-m" "corrugated.sim"]}
+  ;; clojure -M:dev:render-html -> build-time docs/samples/operator-console.html
+  :render-html {:main-opts ["-m" "corrugated.render-html"]}
   :test {:extra-paths ["test"]
          :extra-deps {io.github.cognitect-labs/test-runner
                       {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
