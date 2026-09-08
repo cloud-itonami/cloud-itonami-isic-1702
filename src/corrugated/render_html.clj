@@ -4,7 +4,7 @@
   Drives the REAL actor stack (corrugated.operation -> corrugated.governor -> corrugated.store).
   No invented numbers, no timestamps, byte-identical across reruns."
   (:require [jp-go-dds.skin]
-            [clojure.string :as str]
+            [kotoba.lang.text :as str]
             [corrugated.store :as store]
             [corrugated.operation :as op]
             [corrugated.phase :as phase]
