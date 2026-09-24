@@ -3,7 +3,7 @@
   Closes flagship checklist item 2 (com-junkawasaki/root ADR-2607189300).
   Drives the REAL actor stack (corrugated.operation -> corrugated.governor -> corrugated.store).
   No invented numbers, no timestamps, byte-identical across reruns."
-  (:require [jp-go-dds.skin]
+  (:require [kotoba.io :as kio] [jp-go-dds.skin]
             [kotoba.lang.text :as str]
             [corrugated.store :as store]
             [corrugated.operation :as op]
@@ -279,8 +279,8 @@
   (let [out (or (first args) "docs/samples/operator-console.html")
         db (run-demo!)
         html (render db)
-        f (java.io.File. out)]
-    (when-let [parent (.getParentFile f)]
-      (.mkdirs parent))
+        f (kio/file out)]
+    (when-let [parent (kio/parent-file f)]
+      (kio/mkdirs parent))
     (spit out html)
     (println "wrote" out)))
