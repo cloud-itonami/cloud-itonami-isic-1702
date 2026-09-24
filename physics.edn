@@ -1,0 +1,33 @@
+;; What this vertical's robot physically does, declared for
+;; kotoba.robotics.process (kotoba-lang/robotics). `kbb -M:dev:physics` runs it.
+;;
+;; README has no "Robotics premise" section. The plant runs the corrugator
+;; and converting lines, and checks board by burst and edge-crush tests. Its
+;; physical work here: heating the double-backer liner through the hot plates
+;; until the starch glue line between liner and flute tips gels, and
+;; palletising bundles of folded boxes.
+;;
+;; Every number without a cited source is marked `estimate` in its :basis.
+;; Replacing an estimate with a sourced value is this bot's growth work.
+{:physics/schema "itonami.physical-ai.spec.v1"
+ :repo "cloud-itonami/cloud-itonami-isic-1702"
+ :cases
+ [{:id :double-backer-hot-plate
+   :kind :thermal
+   :procedure "the double-backer liner rides over the hot plates; heat crosses the liner to the starch glue line at the flute tips (air in the flutes behind it) until the glue line reaches the starch gel temperature"
+   :params {:conductivity-w-mk 0.10 :density-kg-m3 700.0 :specific-heat-j-kgk 1400.0
+            :t0-c 40.0 :t-hot-c 170.0 :h-front-w-m2k 300.0 :t-back-ambient-c 40.0 :h-back-w-m2k 15.0
+            :threshold-c 65.0 :duration-s 20.0 :nodes 11}
+   :sweep {:param :thickness-m :values [0.0002 0.0003 0.0004 0.0006 0.0008]}
+   :quantity :time-to-threshold-s
+   :limit {:max 8.0 :basis "estimate: 8 s on the hot-plate section at corrugator line speed"}
+   :boundary {:lo 0.0001 :hi 0.003}}
+  {:id :box-bundle-palletising
+   :kind :manipulator
+   :procedure "palletising arm lifts a strapped bundle of folded boxes from the counter-ejector conveyor onto the pallet"
+   :params {:l1-m 0.70 :l2-m 0.60 :m1-kg 12.0 :m2-kg 8.0
+            :from [0.90 0.20] :to [0.40 0.70] :duration-s 2.5 :steps 400}
+   :sweep {:param :payload-kg :values [5.0 10.0 15.0 20.0 25.0]}
+   :quantity :peak-tau1-nm
+   :limit {:max 250.0 :basis "estimate: continuous shoulder torque of a ~25 kg class palletising arm"}
+   :boundary {:lo 1.0 :hi 80.0}}]}
