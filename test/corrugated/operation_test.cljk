@@ -4,7 +4,7 @@
   contract (HARD holds, escalation, phase gating) is exercised in
   `corrugated.governor-contract-test`; the Store contract in
   `corrugated.store-contract-test`."
-  (:require [clojure.test :refer [deftest is testing]]
+  (:require [kotoba.test :refer [deftest is testing]]
             [langgraph.graph :as g]
             [corrugated.operation :as op]
             [corrugated.store :as store]))
