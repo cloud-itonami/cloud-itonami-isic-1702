@@ -49,7 +49,7 @@
 io.github.kotoba-lang/langgraph
         {:local/root "../../kotoba-lang/kotoba/lib/kotoba.langgraph"}
         io.github.kotoba-lang/langchain
-        {:local/root "../../kotoba-lang/langchain"}}
+        {:local/root "../../kotoba-lang/kotoba/lib/kotoba.langchain"}}
  :aliases
  {
   ;; kbb -M:physics -> the physical-AI bot's measurement: runs physics.edn on
@@ -63,7 +63,7 @@ io.github.kotoba-lang/langgraph
   ;; with the top-level :deps override above).
   :dev {:override-deps
         {io.github.kotoba-lang/langchain
-         {:local/root "../../kotoba-lang/langchain"}}}
+        {:local/root "../../kotoba-lang/kotoba/lib/kotoba.langchain"}}}
   ;; kbb -M:dev:run  -> drive the demo through one OperationActor
   :run {:main-opts ["-m" "corrugated.sim"]}
   ;; kbb -M:dev:render-html -> build-time docs/samples/operator-console.html
